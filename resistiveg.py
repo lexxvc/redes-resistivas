@@ -4,6 +4,7 @@ from scipy.sparse.linalg import spsolve
 from numpy.linalg import solve, norm
 from numpy.random import rand
 import PySpice.Logging.Logging as Logging
+from pruebas import selector
 logger = Logging.setup_logging()
 from PySpice.Spice.Netlist import Circuit
 import numpy as np 
@@ -150,3 +151,82 @@ corrientes=np.loadtxt('corrientes.csv', dtype='str')
 corr=np.matrix(corrientes)
 corry=corr.shape[0]
 corrx=corr.shape[1]
+selector ==0
+if selector ==0:
+    arr=[]
+    row=[] 
+    current=0
+    for i in range(mnasize):
+        row.append(0.0000000000) 
+        arr.append(row)
+    mna=np.matrix(arr)
+    pos1=0
+    pos2=0
+    temp=0
+    for i in range (jmax+2):
+        if ('gnd' in corr[i,1])or('gnd' in corr[i,2]):
+            if 'gnd' in corr[i,1]and 'Vi' not in corr[i,0] :
+                for j in range (len(nodos)):
+                    if nodos[j] in corr[i,2]:
+                        pos2=j
+                        #print('pos1 xxx')
+# print('pos2 ',pos2,"  G= ", corr[i,0])
+                        mna[pos2,pos2]=G[i]+mna[pos2,pos2]
+            if 'gnd' in corr[i,2]and 'Vi' not in corr[i,0]:
+                for j in range (len(nodos)):
+                    if  nodos[j] in corr[i,1]:
+                        pos1=j
+#  print('pos1 ',pos1,"  G= ", corr[i,0])   
+#   print('pos2 xxx')         
+                        mna[pos1,pos1]=G[i]+mna[pos1,pos1] 
+            if 'Vi' in corr[i,0]:
+                for j in range (len(nodos)):
+                    if  nodos[j] in corr[i,1]:
+                        pos1=j
+                        pos2=len(nodos)
+                        mna[pos1,pos2]=1
+                        mna[pos2,pos1]=1
+                        #print (pos1,pos2,'Vi')
+        else :
+            for j in range (len(nodos)):
+                if  nodos[j] in corr[i,1]:
+                    pos1=j
+                    #print('pos1 ',pos1,"  G= ", corr[i,0])
+                if nodos[j] in corr[i,2]:
+                    pos2=j
+                    """
+            if (i>0 and i<jmax):
+                print(pos1,pos2,'A')
+                print(mna[pos1,pos1])
+                print(mna[pos2,pos2])
+                print(mna[pos1,pos2])
+                print(mna[pos2,pos1])
+                """
+                    #print('pos2 ',pos2,"  -G= ", corr[i,0])
+            mna[pos1,pos1]=G[i]+mna[pos1,pos1]
+            mna[pos2,pos2]=G[i]+mna[pos2,pos2]
+            mna[pos1,pos2]=-G[i]+mna[pos1,pos2]
+            mna[pos2,pos1]=-G[i]+mna[pos2,pos1] 
+            """
+            if (i>0 and i<jmax):
+                print(pos1,pos2,'B')
+                print(mna[pos1,pos1])
+                print(mna[pos2,pos2])
+                print(mna[pos1,pos2])
+                print(mna[pos2,pos1])
+                """
+       
+    fd=open('mna.csv','w')
+    fd=open('mna.csv','a')
+    for w in range (mnasize-1):
+        fd.write(str(nodos[w])+',')
+    fd.write('Iv1 ,'+'\n')
+    for i in range (mnasize):
+        for j in range (mnasize):
+            fd.write(str(mna[i,j])+',')
+        fd.write('\n')
+    fd.close()
+    
+    print(' MATRIZ MNA NUMERICA') 
+    print (mna)
+    
