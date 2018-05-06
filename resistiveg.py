@@ -67,3 +67,13 @@ circuito.V('fin','n'+str(fin[0])+str(fin[1]),circuito.gnd,0)
 fd.close()
 simulator = circuito.simulator(temperature=25, nominal_temperature=25)
 analysis = simulator.operating_point()
+fd=open('voltajes.csv','w')
+for i in range (0,RMax):
+    for j in range (0,CMax):
+        if (mapa[i,j]== 1):
+                node = analysis['n'+str(i+1)+str(j+1)]
+                #print('Nodo {}: {} V'.format(str(node), float(node)))
+                fd=open('voltajes.csv','a')
+                fd.write('Nodo, {}, {}'.format(str(node), float(node))+'\n')
+                fd.close()
+
