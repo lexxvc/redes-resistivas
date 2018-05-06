@@ -76,4 +76,43 @@ for i in range (0,RMax):
                 fd=open('voltajes.csv','a')
                 fd.write('Nodo, {}, {}'.format(str(node), float(node))+'\n')
                 fd.close()
-
+""" pasamos el netlist del txt a una matriz"""
+datos=np.loadtxt('datos.txt', dtype='str')
+mnl1=np.matrix(datos)             #matriz del net list
+mnl=mnl1.transpose()  # transpuesta 
+jmax=mnl.shape[1]-1   # jmax = 6
+imax=mnl.shape[0]-1   # imax = 3
+n=0
+m=0
+ncont=0
+nodos=[]
+nin=[0 for x in range(jmax**2)] #nodos de entrada
+nout=[0 for x in range(jmax**2)]#nodos de salida
+#print (imax , jmax)
+#print(mnl)
+# rutina para contar nodos y eliminar repetidos
+for i in range(1,imax):
+    for j in range(0,jmax):
+        if(mnl[i,j]!=('n'+str(fin[0])+str(fin[1]))):
+            if(i<=1):
+                if(mnl[i,j]!=ncont):
+                    ncont= mnl[i,j]
+                    nin[n]=mnl[i,j]
+                    #print(mnl[i,j])
+                    n=n+1   
+            if(i==2):
+                if(mnl[i,j]!=ncont):
+                    ncont= mnl[i,j]
+                    nout[m]=mnl[i,j]
+                    #print(mnl[i,j])
+                    m=m+1                    
+for k in range (0,jmax-1):
+    for l in range (0,jmax-1):
+        if (nin[k] == nout[l]):
+            nout.pop(l) 
+      
+nin.extend(nout)
+nodos =[elemento for elemento in nin if elemento != 0]
+nodos=set(nodos)
+nodos =sorted(list(nodos))
+print (nodos)
