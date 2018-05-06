@@ -151,82 +151,101 @@ corrientes=np.loadtxt('corrientes.csv', dtype='str')
 corr=np.matrix(corrientes)
 corry=corr.shape[0]
 corrx=corr.shape[1]
-selector ==0
-if selector ==0:
-    arr=[]
-    row=[] 
-    current=0
-    for i in range(mnasize):
-        row.append(0.0000000000) 
-        arr.append(row)
-    mna=np.matrix(arr)
-    pos1=0
-    pos2=0
-    temp=0
-    for i in range (jmax+2):
-        if ('gnd' in corr[i,1])or('gnd' in corr[i,2]):
-            if 'gnd' in corr[i,1]and 'Vi' not in corr[i,0] :
-                for j in range (len(nodos)):
-                    if nodos[j] in corr[i,2]:
-                        pos2=j
-                        #print('pos1 xxx')
+arr=[]
+row=[] 
+current=0
+for i in range(mnasize):
+    row.append(0.0000000000) 
+    arr.append(row)
+mna=np.matrix(arr)
+pos1=0
+pos2=0
+temp=0
+for i in range (jmax+2):
+    if ('gnd' in corr[i,1])or('gnd' in corr[i,2]):
+        if 'gnd' in corr[i,1]and 'Vi' not in corr[i,0] :
+            for j in range (len(nodos)):
+                if nodos[j] in corr[i,2]:
+                    pos2=j
+                    #print('pos1 xxx')
 # print('pos2 ',pos2,"  G= ", corr[i,0])
-                        mna[pos2,pos2]=G[i]+mna[pos2,pos2]
-            if 'gnd' in corr[i,2]and 'Vi' not in corr[i,0]:
-                for j in range (len(nodos)):
-                    if  nodos[j] in corr[i,1]:
-                        pos1=j
-#  print('pos1 ',pos1,"  G= ", corr[i,0])   
-#   print('pos2 xxx')         
-                        mna[pos1,pos1]=G[i]+mna[pos1,pos1] 
-            if 'Vi' in corr[i,0]:
-                for j in range (len(nodos)):
-                    if  nodos[j] in corr[i,1]:
-                        pos1=j
-                        pos2=len(nodos)
-                        mna[pos1,pos2]=1
-                        mna[pos2,pos1]=1
-                        #print (pos1,pos2,'Vi')
-        else :
+                    mna[pos2,pos2]=G[i]+mna[pos2,pos2]
+        if 'gnd' in corr[i,2]and 'Vi' not in corr[i,0]:
             for j in range (len(nodos)):
                 if  nodos[j] in corr[i,1]:
                     pos1=j
-                    #print('pos1 ',pos1,"  G= ", corr[i,0])
-                if nodos[j] in corr[i,2]:
-                    pos2=j
-                    """
-            if (i>0 and i<jmax):
-                print(pos1,pos2,'A')
-                print(mna[pos1,pos1])
-                print(mna[pos2,pos2])
-                print(mna[pos1,pos2])
-                print(mna[pos2,pos1])
+#  print('pos1 ',pos1,"  G= ", corr[i,0])   
+#   print('pos2 xxx')         
+                    mna[pos1,pos1]=G[i]+mna[pos1,pos1] 
+        if 'Vi' in corr[i,0]:
+            for j in range (len(nodos)):
+                if  nodos[j] in corr[i,1]:
+                    pos1=j
+                    pos2=len(nodos)
+                    mna[pos1,pos2]=1
+                    mna[pos2,pos1]=1
+                    #print (pos1,pos2,'Vi')
+    else :
+        for j in range (len(nodos)):
+            if  nodos[j] in corr[i,1]:
+                pos1=j
+                #print('pos1 ',pos1,"  G= ", corr[i,0])
+            if nodos[j] in corr[i,2]:
+                pos2=j
                 """
-                    #print('pos2 ',pos2,"  -G= ", corr[i,0])
-            mna[pos1,pos1]=G[i]+mna[pos1,pos1]
-            mna[pos2,pos2]=G[i]+mna[pos2,pos2]
-            mna[pos1,pos2]=-G[i]+mna[pos1,pos2]
-            mna[pos2,pos1]=-G[i]+mna[pos2,pos1] 
+        if (i>0 and i<jmax):
+            print(pos1,pos2,'A')
+            print(mna[pos1,pos1])
+            print(mna[pos2,pos2])
+            print(mna[pos1,pos2])
+            print(mna[pos2,pos1])
             """
-            if (i>0 and i<jmax):
-                print(pos1,pos2,'B')
-                print(mna[pos1,pos1])
-                print(mna[pos2,pos2])
-                print(mna[pos1,pos2])
-                print(mna[pos2,pos1])
-                """
-       
-    fd=open('mna.csv','w')
-    fd=open('mna.csv','a')
-    for w in range (mnasize-1):
-        fd.write(str(nodos[w])+',')
-    fd.write('Iv1 ,'+'\n')
-    for i in range (mnasize):
-        for j in range (mnasize):
-            fd.write(str(mna[i,j])+',')
-        fd.write('\n')
-    fd.close()
-    
-    print(' MATRIZ MNA NUMERICA') 
-    print (mna)
-    
+                #print('pos2 ',pos2,"  -G= ", corr[i,0])
+        mna[pos1,pos1]=G[i]+mna[pos1,pos1]
+        mna[pos2,pos2]=G[i]+mna[pos2,pos2]
+        mna[pos1,pos2]=-G[i]+mna[pos1,pos2]
+        mna[pos2,pos1]=-G[i]+mna[pos2,pos1] 
+        """
+        if (i>0 and i<jmax):
+            print(pos1,pos2,'B')
+            print(mna[pos1,pos1])
+            print(mna[pos2,pos2])
+            print(mna[pos1,pos2])
+            print(mna[pos2,pos1])
+            """
+   
+fd=open('mna.csv','w')
+fd=open('mna.csv','a')
+for w in range (mnasize-1):
+    fd.write(str(nodos[w])+',')
+fd.write('Iv1 ,'+'\n')
+for i in range (mnasize):
+    for j in range (mnasize):
+        fd.write(str(mna[i,j])+',')
+    fd.write('\n')
+fd.close()
+
+print(' MATRIZ MNA NUMERICA') 
+print (mna)
+
+
+""" resolviendo con sparce"""
+A=lil_matrix(mna)
+mov=mnasize-1
+roff=[] 
+for i in range(mnasize):
+    roff.append(0) 
+b=np.matrix(roff)
+b=np.transpose(b)
+for i in range (mnasize):
+    b[mov-i,0]=(mna[i,mov])*V
+print(b)
+A = A.tocsr()
+x = spsolve(A,b)
+
+for i in range (mnasize):
+    if (i < mov):
+        print (nodos[i], '= V',x[i])
+    else:
+        print ('Iv1 = A',x[i] )
+
