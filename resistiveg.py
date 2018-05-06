@@ -116,3 +116,37 @@ nodos =[elemento for elemento in nin if elemento != 0]
 nodos=set(nodos)
 nodos =sorted(list(nodos))
 print (nodos)
+""" MNA matrix"""
+mnasize = len(nodos)+1  
+G=[0 for x in range (len(mnl1))]  
+for i in range (0,len(mnl1)):
+    G[i]=1/float(mnl[3,i])
+fd=open('corrientes.csv','w')
+
+for i in range (jmax+1):
+    fd=open('corrientes.csv','a')
+    if (mnl1[i,1]== 'n'+str(fin[0])+str(fin[1])):
+        mnl1[i,1]= 'gnd'
+        #current='I'+str(i+1),mnl1[i,1],mnl1[i,2],'G'+str(i+1)
+        current='G'+str(i+1),mnl1[i,1],mnl1[i,2],str(G[i])
+        
+    if (mnl1[i,2]== 'n'+str(fin[0])+str(fin[1])):
+        mnl1[i,2]= 'gnd'
+        #current= 'I'+str(i+1),mnl1[i,1],'-'+mnl1[i,2],'G'+str(i+1)
+        current= 'G'+str(i+1),mnl1[i,1],mnl1[i,2],str(G[i])
+        
+        
+    else:
+        #current= 'I'+str(i+1),mnl1[i,1],'-'+mnl1[i,2],'G'+str(i+1)
+        current= 'G'+str(i+1),mnl1[i,1],mnl1[i,2],str(G[i])
+        
+    #print (current)
+    fd.write(str(current)+'\n')
+current = 'Vi','n'+str(inicio[0])+str(inicio[1]),'gnd',V
+fd.write(str(current)+'\n') 
+fd.close() 
+  
+corrientes=np.loadtxt('corrientes.csv', dtype='str')
+corr=np.matrix(corrientes)
+corry=corr.shape[0]
+corrx=corr.shape[1]
