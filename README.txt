@@ -1,1 +1,1 @@
-Projecto de investigacion INAOE
+Proyecto de investigacion INAOE
