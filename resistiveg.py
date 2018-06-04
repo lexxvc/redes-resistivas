@@ -1,10 +1,10 @@
-""" se importan los complementos"""
+""" se importal complementos"""
 from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
-from numpy.linalg import solve, norm
-from numpy.random import rand
+from scipy import  misc
+import matplotlib.pyplot as plt
+#from numpy.linalg import solve, norm
 import PySpice.Logging.Logging as Logging
-from pruebas import selector
 logger = Logging.setup_logging()
 from PySpice.Spice.Netlist import Circuit
 import numpy as np 
@@ -19,7 +19,7 @@ Rdia = (2*Rc)**0.5
 R=0
 """ se definen los puntos de inicio y fin manualmente"""
 inicio = [1,1]
-fin = [3,2]
+fin = [9,9]
 V=10     
 Rcont =0        
 """"este es el mayor numero de pasos que puede hacer el robot para evitar que se cicle"""
@@ -228,24 +228,74 @@ fd.close()
 print(' MATRIZ MNA NUMERICA') 
 print (mna)
 
+"""seleccionador matrices normal vs dispersa"""
+selectsolve = 1
+if selectsolve == 0:
+    MNA=np.matrix(mna)
+    mov=mnasize-1
+    roff=[] 
+    for i in range(mnasize):
+        roff.append(0) 
+    b=np.matrix(roff)
+    b=np.transpose(b)
+    for i in range (mnasize):
+        b[mov-i,0]=(mna[i,mov])*V
+    print(b)
+    result=(MNA.I)*b
+    print( 'resultados \n',result)
+else :
+    mov=mnasize-1
+    roff=[] 
+    for i in range(mnasize):
+        roff.append(0) 
+    b=np.matrix(roff)
+    b=np.transpose(b)
+    for i in range (mnasize):
+        b[mov-i,0]=(mna[i,mov])*V
+    print(b)
+    """ resolviendo con sparce"""
+    A=lil_matrix(mna)
+    A = A.tocsr()
+    x = spsolve(A,b)
+    for i in range (mnasize):
+        if (i < mov):
+            print (nodos[i], '= V',x[i])
+        else:
+            print ('Iv1 = A',x[i] )
+""" LCC"""
+i=RMax
+j=CMax
+Y=np.matrix(mapa)
+Y=Y.fill(0)
+temp=[0,0]
+val=-100
+ruta=[[i,j]]
+NVoltajes=x.shape
+for cont in range (NVoltajes[0]):
+    nods= [[i-1, j-1], [i-1, j], [i-1, j+1], [i, j+1], [i+1, j+1], [i+1, j], [i+1, j-1], [i, j-1]]
+    for k in range (0,7):
+        nod = nods[k]
+        if(i!=fin[0])and(j!=fin[1]):
+            if not (nod[0]==temp[0])and (nod[1]==temp[1]):
+                if(nod[0]<= RMax) and (nod[1]<= CMax)and(nod[0]>=1)and(nod[1]>=1):
+                    if (mapa[nod]==1):
+                        if (nod[0]== i)and(nod[1]==j):
+                            Rt=Rc
+                        if (nod[1]!= i)and(nod[2]!=j):
+                            Rt=Rdia
+                        if((Y[i,j]-Y[nod])/Rt)> val:
+                            newnode= nod
+                            val=(Y[i,j]-Y[nod])/Rt
+                            val2=Y[nod]
+                            val=-100
+                            temp=i,j
+                            i=newnode[0]
+                            j=newnode[1]
+                            ruta=[ruta,[i,j]]
+                            print(ruta)
 
-""" resolviendo con sparce"""
-A=lil_matrix(mna)
-mov=mnasize-1
-roff=[] 
-for i in range(mnasize):
-    roff.append(0) 
-b=np.matrix(roff)
-b=np.transpose(b)
-for i in range (mnasize):
-    b[mov-i,0]=(mna[i,mov])*V
-print(b)
-A = A.tocsr()
-x = spsolve(A,b)
-
-for i in range (mnasize):
-    if (i < mov):
-        print (nodos[i], '= V',x[i])
-    else:
-        print ('Iv1 = A',x[i] )
-
+""" impresion del mapa y propuesta para generar la ruta"""
+plt.plot([0,0,2,2,4,4,6,6,8,8]
+        ,[0,4,4,2,2,8,8,2,2,8],'b')
+plt.imshow(mapa)
+plt.show()
