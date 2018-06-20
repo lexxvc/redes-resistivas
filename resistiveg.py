@@ -254,15 +254,27 @@ else :
         b[mov-i,0]=(mna[i,mov])*V
     print(b)
     """ resolviendo con sparce"""
+    """ resolviendo con sparce"""
     A=lil_matrix(mna)
     A = A.tocsr()
     x = spsolve(A,b)
+    
+    fd=open('vsp.txt','w')
+    fd=open('vsp.txt','a')
     for i in range (mnasize):
         if (i < mov):
+            """ guardando los datos de voltajes en un archivo """
+            fd.write(str(nodos[i])+' '+str(x[i])+'\n')
             print (nodos[i], '= V',x[i])
         else:
             print ('Iv1 = A',x[i] )
-""" LCC"""
+    fd.close()
+""" pasando los datos del archivo a una matriz para su manipulacion"""
+datax=np.loadtxt('vsp.txt', dtype='str')
+mvs=np.matrix(datax)             
+print (mvs)
+
+""" LCC
 i=RMax
 j=CMax
 Y=np.matrix(mapa)
@@ -293,6 +305,7 @@ for cont in range (NVoltajes[0]):
                             j=newnode[1]
                             ruta=[ruta,[i,j]]
                             print(ruta)
+                            """
 
 """ impresion del mapa y propuesta para generar la ruta"""
 plt.plot([0,0,2,2,4,4,6,6,8,8]
