@@ -1,4 +1,4 @@
-""" se importal complementos"""
+""" se importan complementos"""
 from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
 from scipy import  misc
@@ -36,21 +36,21 @@ for i in range (0,RMax):
         if (mapa[i,j]== 1):
             if (mapa[i+1,j]==1)and(i+1<=RMax):
                 Rcont=Rcont+1
-                R=circuito.R(Rcont,   'n'+str(i+1)+str(j+1),     'n'+str(i+2)+str(j+1), Rc)
+                R=circuito.R(Rcont,   'n'+str(i+1)+'a'+str(j+1),     'n'+str(i+2)+'a'+str(j+1), Rc)
                 valores =[circuito['R'+str(Rcont)]]
                 fd = open(file,'a')
                 fd.write(str(valores[0])+'\n')
                 
             if (mapa[i,j+1]==1)and(j+1<=CMax):
                 Rcont=Rcont+1
-                circuito.R(Rcont,     'n'+str(i+1)+str(j+1),      'n'+str(i+1)+str(j+2), Rc)
+                circuito.R(Rcont,     'n'+str(i+1)+'a'+str(j+1),      'n'+str(i+1)+'a'+str(j+2), Rc)
                 valores =[circuito['R'+str(Rcont)]]
                 fd = open(file,'a')
                 fd.write(str(valores[0])+'\n')
                 
             if (mapa[i+1,j+1]==1)and(i+1<=RMax)and(j+1<=CMax):
                 Rcont=Rcont+1
-                circuito.R(Rcont,     'n'+str(i+1)+str(j+1),       'n'+str(i+2)+str(j+2), Rdia)
+                circuito.R(Rcont,     'n'+str(i+1)+'a'+str(j+1),       'n'+str(i+2)+'a'+str(j+2), Rdia)
                 valores =[circuito['R'+str(Rcont)]]
                 fd = open(file,'a')
                 fd.write(str(valores[0])+'\n')
@@ -58,25 +58,28 @@ for i in range (0,RMax):
             if(i>1):
                 if(mapa[i-1,j+1]==1)and(i-1>=1)and(j+1<=CMax):
                     Rcont=Rcont+1
-                    circuito.R(Rcont, 'n'+str(i+1)+str(j+1),      'n'+str(i)+str(j+2), Rdia)
+                    circuito.R(Rcont, 'n'+str(i+1)+'a'+str(j+1),      'n'+str(i)+'a'+str(j+2), Rdia)
                     valores =[circuito['R'+str(Rcont)]]
                     fd = open(file,'a')
                     fd.write(str(valores[0])+'\n')
                                      
-circuito.V('ini', 'n'+str(inicio[0])+str(inicio[1]), 'n'+str(fin[0])+str(fin[1]), V)
-circuito.V('fin','n'+str(fin[0])+str(fin[1]),circuito.gnd,0)
+circuito.V('ini', 'n'+str(inicio[0])+'a'+str(inicio[1]), 'n'+str(fin[0])+'a'+str(fin[1]), V)
+circuito.V('fin','n'+str(fin[0])+'a'+str(fin[1]),circuito.gnd,0)
 fd.close()
+
 simulator = circuito.simulator(temperature=25, nominal_temperature=25)
 analysis = simulator.operating_point()
 fd=open('voltajes.csv','w')
 for i in range (0,RMax):
     for j in range (0,CMax):
         if (mapa[i,j]== 1):
-                node = analysis['n'+str(i+1)+str(j+1)]
+                node = analysis['n'+str(i+1)+'a'+str(j+1)]
                 #print('Nodo {}: {} V'.format(str(node), float(node)))
                 fd=open('voltajes.csv','a')
                 fd.write('Nodo, {}, {}'.format(str(node), float(node))+'\n')
                 fd.close()
+
+
 """ pasamos el netlist del txt a una matriz"""
 datos=np.loadtxt('datos.txt', dtype='str')
 mnl1=np.matrix(datos)             #matriz del net list
@@ -94,7 +97,7 @@ nout=[0 for x in range(jmax**2)]#nodos de salida
 # rutina para contar nodos y eliminar repetidos
 for i in range(1,imax):
     for j in range(0,jmax):
-        if(mnl[i,j]!=('n'+str(fin[0])+str(fin[1]))):
+        if(mnl[i,j]!=('n'+str(fin[0])+'a'+str(fin[1]))):
             if(i<=1):
                 if(mnl[i,j]!=ncont):
                     ncont= mnl[i,j]
@@ -116,7 +119,7 @@ nin.extend(nout)
 nodos =[elemento for elemento in nin if elemento != 0]
 nodos=set(nodos)
 nodos =sorted(list(nodos))
-print (nodos)
+#print (nodos)
 """ MNA matrix"""
 mnasize = len(nodos)+1  
 G=[0 for x in range (len(mnl1))]  
@@ -126,12 +129,12 @@ fd=open('corrientes.csv','w')
 
 for i in range (jmax+1):
     fd=open('corrientes.csv','a')
-    if (mnl1[i,1]== 'n'+str(fin[0])+str(fin[1])):
+    if (mnl1[i,1]== 'n'+str(fin[0])+'a'+str(fin[1])):
         mnl1[i,1]= 'gnd'
         #current='I'+str(i+1),mnl1[i,1],mnl1[i,2],'G'+str(i+1)
         current='G'+str(i+1),mnl1[i,1],mnl1[i,2],str(G[i])
         
-    if (mnl1[i,2]== 'n'+str(fin[0])+str(fin[1])):
+    if (mnl1[i,2]== 'n'+str(fin[0])+'a'+str(fin[1])):
         mnl1[i,2]= 'gnd'
         #current= 'I'+str(i+1),mnl1[i,1],'-'+mnl1[i,2],'G'+str(i+1)
         current= 'G'+str(i+1),mnl1[i,1],mnl1[i,2],str(G[i])
@@ -143,7 +146,7 @@ for i in range (jmax+1):
         
     #print (current)
     fd.write(str(current)+'\n')
-current = 'Vi','n'+str(inicio[0])+str(inicio[1]),'gnd',V
+current = 'Vi','n'+str(inicio[0])+'a'+str(inicio[1]),'gnd',V
 fd.write(str(current)+'\n') 
 fd.close() 
   
@@ -254,7 +257,6 @@ else :
         b[mov-i,0]=(mna[i,mov])*V
     print(b)
     """ resolviendo con sparce"""
-    """ resolviendo con sparce"""
     A=lil_matrix(mna)
     A = A.tocsr()
     x = spsolve(A,b)
@@ -271,14 +273,33 @@ else :
     fd.close()
 """ pasando los datos del archivo a una matriz para su manipulacion"""
 datax=np.loadtxt('vsp.txt', dtype='str')
+""" llenando la matriz Y con los voltajes segun su nodo"""
+NVoltajes=x.shape
+arr=[]
+row=[] 
+for i in range(CMax):
+    row.append(0.0)
+    arr.append(row)
+Y=np.matrix(arr)
+print (NVoltajes)
+print (Y)
 mvs=np.matrix(datax)             
-print (mvs)
+for i in range (mvs.shape[0]):
+    xaux = mvs[i,0].split('n')
+    aux = str(xaux)
+    b=aux.split('a')
+    bob=str(b)
+    wui = bob[8:9]
+    yei = bob[13:14]
+    j=int(wui)-1
+    k=int(yei)-1
+    #print(type(wui),type(yei))
+    Y[j,k]=mvs[i,1]
+print(Y)   
 
-""" LCC
+""" LCC"""
 i=RMax
 j=CMax
-Y=np.matrix(mapa)
-Y=Y.fill(0)
 temp=[0,0]
 val=-100
 ruta=[[i,j]]
@@ -305,10 +326,10 @@ for cont in range (NVoltajes[0]):
                             j=newnode[1]
                             ruta=[ruta,[i,j]]
                             print(ruta)
-                            """
+                            
 
-""" impresion del mapa y propuesta para generar la ruta"""
+""" impresion del mapa y propuesta para generar la ruta
 plt.plot([0,0,2,2,4,4,6,6,8,8]
         ,[0,4,4,2,2,8,8,2,2,8],'b')
 plt.imshow(mapa)
-plt.show()
+plt.show()"""
