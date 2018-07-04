@@ -298,36 +298,48 @@ for i in range (mvs.shape[0]):
 print(Y)   
 
 """ LCC"""
-i=RMax
-j=CMax
+i=inicio[0]-1
+j=inicio[1]-1
 temp=[0,0]
-val=-100
-ruta=[[i,j]]
+temp2=[100,100]
+val=100
+ruta=[0,0]
+newnode=[0,0]
 NVoltajes=x.shape
 for cont in range (NVoltajes[0]):
-    nods= [[i-1, j-1], [i-1, j], [i-1, j+1], [i, j+1], [i+1, j+1], [i+1, j], [i+1, j-1], [i, j-1]]
-    for k in range (0,7):
+    nods= [[i-1, j], [i-1, j+1], [i, j+1], [i+1, j+1], [i+1, j], [i+1, j-1], [i, j-1],[i-1, j-1]]
+    for k in range (0,8):
         nod = nods[k]
-        if(i!=fin[0])and(j!=fin[1]):
-            if not (nod[0]==temp[0])and (nod[1]==temp[1]):
-                if(nod[0]<= RMax) and (nod[1]<= CMax)and(nod[0]>=1)and(nod[1]>=1):
-                    if (mapa[nod]==1):
-                        if (nod[0]== i)and(nod[1]==j):
-                            Rt=Rc
-                        if (nod[1]!= i)and(nod[2]!=j):
-                            Rt=Rdia
-                        if((Y[i,j]-Y[nod])/Rt)> val:
-                            newnode= nod
-                            val=(Y[i,j]-Y[nod])/Rt
-                            val2=Y[nod]
-                            val=-100
-                            temp=i,j
-                            i=newnode[0]
-                            j=newnode[1]
-                            ruta=[ruta,[i,j]]
-                            print(ruta)
-                            
-
+        if (nod[0]>=0 and nod[1]>=0):
+            #print(nod)
+            if(i!=fin[0])and(j!=fin[1]):
+                #print('#1')
+                if not (nod[0]==temp[0])and(nod[1]==temp[1]):
+                    #print('#2')
+                    if(nod[0]<= RMax) and (nod[1]<= CMax):
+                        #print('#3')
+                        if (mapa[nod[0],nod[1]]==1):
+                            #print('#4')
+                            if (nod[0]== i)and(nod[1]==j):
+                                Rt=Rc
+                            if (nod[0]!= i)and(nod[1]!=j):
+                                Rt=Rdia
+                            #print('calc',(Y[i,j]-Y[nod[0],nod[1]])/Rt)
+                            if((Y[i,j]-Y[nod[0],nod[1]])/Rt)<=val+1 and ((Y[i,j]-Y[nod[0],nod[1]])/Rt)>0 :
+                                #print ('nodo',nod)
+                                #print('mapa',mapa[nod[0],nod[1]])
+                                #print('temporal',temp)
+                                newnode= nod
+                                val=(Y[i,j]-Y[nod[0],nod[1]])/Rt
+                                #print('valor',val)
+                                temp2=[i,j]
+                                #print('temp2',temp2)
+                                i=newnode[0]
+                                j=newnode[1]
+                                temp=[i,j]
+                                ruta=[ruta,[i,j]]
+                                print('ruta',ruta)
+                                #print('temporal 2',temp)
 """ impresion del mapa y propuesta para generar la ruta
 plt.plot([0,0,2,2,4,4,6,6,8,8]
         ,[0,4,4,2,2,8,8,2,2,8],'b')
