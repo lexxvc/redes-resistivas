@@ -16,7 +16,7 @@ mapa = np.matrix(title)
 file='datos.txt'
 Rc = 1
 Rdia = (2*Rc)**0.5
-R=0
+Rt=0
 """ se definen los puntos de inicio y fin manualmente"""
 inicio = [1,1]
 fin = [9,9]
@@ -298,50 +298,59 @@ for i in range (mvs.shape[0]):
 print(Y)   
 
 """ LCC"""
+xaxis=[]
+yaxis=[]
 i=inicio[0]-1
 j=inicio[1]-1
-temp=[0,0]
+temp=[0,0]#"""cambiar con variables de inicio"""
 temp2=[100,100]
-val=100
+val=-100
 ruta=[0,0]
 newnode=[0,0]
 NVoltajes=x.shape
-for cont in range (NVoltajes[0]):
+for cont in range (NVoltajes[0]):#NVoltajes
     nods= [[i-1, j], [i-1, j+1], [i, j+1], [i+1, j+1], [i+1, j], [i+1, j-1], [i, j-1],[i-1, j-1]]
-    for k in range (0,8):
+    #print('**************nods',nods)
+    for k in range (7):#7 u 8 ?
         nod = nods[k]
-        if (nod[0]>=0 and nod[1]>=0):
-            #print(nod)
+        if (nod[0]>=0 or nod[1]>=0):
+            print(nod)
             if(i!=fin[0])and(j!=fin[1]):
-                #print('#1')
-                if not (nod[0]==temp[0])and(nod[1]==temp[1]):
-                    #print('#2')
-                    if(nod[0]<= RMax) and (nod[1]<= CMax):
+                print('#1')
+                print(temp,(nod[0]==temp[0]),(nod[1]==temp[1]))
+                if not ((nod[0]==temp[0])and(nod[1]==temp[1])):
+                    print('#2')
+                    if(nod[0]<= RMax) and (nod[1]<= CMax):#delimitar con los limites del mapa
                         #print('#3')
                         if (mapa[nod[0],nod[1]]==1):
                             #print('#4')
-                            if (nod[0]== i)and(nod[1]==j):
+                            if (nod[0]== i)or(nod[1]==j):
                                 Rt=Rc
+                                print('rc')
+                                temp=[i,j]
                             if (nod[0]!= i)and(nod[1]!=j):
                                 Rt=Rdia
+                                print('rdia')
                             #print('calc',(Y[i,j]-Y[nod[0],nod[1]])/Rt)
-                            if((Y[i,j]-Y[nod[0],nod[1]])/Rt)<=val+1 and ((Y[i,j]-Y[nod[0],nod[1]])/Rt)>0 :
-                                #print ('nodo',nod)
+                            if ((Y[i,j]-Y[nod[0],nod[1]])/Rt)>val:
+                                print ('siguiente nodo',nod)
+                                print('nodo evaluado ',i,',',j)
                                 #print('mapa',mapa[nod[0],nod[1]])
-                                #print('temporal',temp)
+                                print('nodo prohibido',temp)
                                 newnode= nod
                                 val=(Y[i,j]-Y[nod[0],nod[1]])/Rt
                                 #print('valor',val)
-                                temp2=[i,j]
-                                #print('temp2',temp2)
+                                #temp=[i,j]
                                 i=newnode[0]
-                                j=newnode[1]
-                                temp=[i,j]
+                                j=newnode[1]                
                                 ruta=[ruta,[i,j]]
+                                print('new nodo',newnode)
                                 print('ruta',ruta)
-                                #print('temporal 2',temp)
-""" impresion del mapa y propuesta para generar la ruta
-plt.plot([0,0,2,2,4,4,6,6,8,8]
-        ,[0,4,4,2,2,8,8,2,2,8],'b')
+        val=-100
+    xaxis.append(j)
+    yaxis.append(i)
+print (ruta)
+"""impresion del mapa y propuesta para generar la ruta"""
+plt.plot(xaxis,yaxis,'b')
 plt.imshow(mapa)
-plt.show()"""
+plt.show()
