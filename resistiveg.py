@@ -307,11 +307,12 @@ temp2=[100,100]
 val=-100
 ruta=[0,0]
 newnode=[0,0]
+case=0
 NVoltajes=x.shape
 for cont in range (NVoltajes[0]):#NVoltajes
     nods= [[i-1, j], [i-1, j+1], [i, j+1], [i+1, j+1], [i+1, j], [i+1, j-1], [i, j-1],[i-1, j-1]]
     #print('**************nods',nods)
-    for k in range (7):#7 u 8 ?
+    for k in range (7):#5 u 8 ?
         nod = nods[k]
         if (nod[0]>=0 or nod[1]>=0):
             print(nod)
@@ -319,33 +320,48 @@ for cont in range (NVoltajes[0]):#NVoltajes
                 print('#1')
                 print(temp,(nod[0]==temp[0]),(nod[1]==temp[1]))
                 if not ((nod[0]==temp[0])and(nod[1]==temp[1])):
-                    print('#2')
-                    if(nod[0]<= RMax) and (nod[1]<= CMax):#delimitar con los limites del mapa
-                        #print('#3')
-                        if (mapa[nod[0],nod[1]]==1):
-                            #print('#4')
-                            if (nod[0]== i)or(nod[1]==j):
-                                Rt=Rc
-                                print('rc')
-                                temp=[i,j]
-                            if (nod[0]!= i)and(nod[1]!=j):
-                                Rt=Rdia
-                                print('rdia')
-                            #print('calc',(Y[i,j]-Y[nod[0],nod[1]])/Rt)
-                            if ((Y[i,j]-Y[nod[0],nod[1]])/Rt)>val:
-                                print ('siguiente nodo',nod)
-                                print('nodo evaluado ',i,',',j)
-                                #print('mapa',mapa[nod[0],nod[1]])
-                                print('nodo prohibido',temp)
-                                newnode= nod
-                                val=(Y[i,j]-Y[nod[0],nod[1]])/Rt
-                                #print('valor',val)
-                                #temp=[i,j]
-                                i=newnode[0]
-                                j=newnode[1]                
-                                ruta=[ruta,[i,j]]
-                                print('new nodo',newnode)
-                                print('ruta',ruta)
+                    if not ((nod[0]== temp2[0])and (nod[1]==temp2[1])):
+                        print('#2')
+                        
+                        if(nod[0]<= RMax) and (nod[1]<= CMax):#delimitar con los limites del mapa
+                            #print('#3')
+                            if (mapa[nod[0],nod[1]]==1):
+                                #print('#4')
+                                temp2=temp
+                                if (nod[0]== i)or(nod[1]==j):
+                                    Rt=Rc
+                                    print('rc')
+                                    if case == 0:
+                                        temp=[i,j]
+                                    else:
+                                        temp=[nod[0],nod[1]-1]
+                                if (nod[0]!= i)and(nod[1]!=j):
+                                    Rt=Rdia
+                                    print('rdia')
+                                    if (nod[0]>i):
+                                        print('bajada')
+                                        temp=[nod[0],nod[1]-1]
+                                        case=1
+                                    if (nod[0]<i):
+                                        print('subida')
+                                        temp=[nod[0]+1,nod[1]]
+                                        case=1
+                                #print('calc',(Y[i,j]-Y[nod[0],nod[1]])/Rt)
+                                if (abs((Y[i,j]-Y[nod[0],nod[1]])/Rt))>val:
+                                    print ('siguiente nodo',nod)
+                                    print('nodo evaluado ',i,',',j)
+                                    #print('mapa',mapa[nod[0],nod[1]])
+                                    print('nodo prohibido',temp)
+                                    print ('nodo super prohibido',temp2)
+                                    newnode= nod
+                                    val=abs((Y[i,j]-Y[nod[0],nod[1]])/Rt)
+                                    #print('valor',val)
+                                    #temp=[i,j]
+                                    i=newnode[0]
+                                    j=newnode[1]                
+                                    ruta=[ruta,[i,j]]
+                                    print('new nodo',newnode)
+                                    print('ruta',ruta)
         val=-100
     xaxis.append(j)
     yaxis.append(i)
