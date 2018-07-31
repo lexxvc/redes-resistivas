@@ -28,10 +28,14 @@ nopsV = V.__len__()
 print(nopsV)
 
 """eval tipo 0"""
-L=[0]
+L=[1]
 """eval tipo 1"""
 k = 0
 for i in range (y-1):
+    L.append(k)
+    L[k+1]=(1/4)*abs(abs(x2-i)+x2-i)-(1/4)*abs(x2-i-abs(x2-i))+(1/4)*abs(x2-i)+(1/4)*abs(x2-i)
+    k=k+1
+for i in range (x-1,y-1):
     L.append(k)
     L[k+1]=(1/4)*abs(abs(x2-i)+x2-i)-(1/4)*abs(x2-i-abs(x2-i))+(1/4)*abs(x2-i)+(1/4)*abs(x2-i)
     k=k+1
@@ -45,8 +49,13 @@ for i in range (x-1):
 print(L)
 nopsL = L.__len__()
 print(nopsL)
+"""###############################"""
 lamda=[]
-for i in range (57): #deberia ser x*y pero se sale de los limites
+for i in range (x*y): #deberia ser x*y pero se sale de los limites
     lamda.append(L[i])
 
+A=[]
+for i in range (x*y):
+    A=A ,eval(lamda,[x1=V[i,0],x2=V[i,2]])
+print(A) 
     
