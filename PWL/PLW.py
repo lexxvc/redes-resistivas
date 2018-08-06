@@ -11,51 +11,58 @@ y=I.shape[1]
 size=(x,y)
 print(size)
 V=[] 
-print ('a',V)
+#print ('a',V)
 for i in range (x):
     V.append([i,0])
     
-print ('b',V)
+#print ('b',V)
 for i in range (y-1):
     V.append([0,i+1])
-print ('c',V)
+#print ('c',V)
 
 for i in range(1,x):
     for j in range (1,y):
         V.append([i,j])
-print ('d',V)
+print ('Datos ',V)
 nopsV = V.__len__()
 print(nopsV)
 
 """eval tipo 0"""
 L=[1]
+
 """eval tipo 1"""
+print('tipo 1')
 k = 0
-for i in range (y-1):
-    L.append(k)
-    L[k+1]=(1/4)*abs(abs(x2-i)+x2-i)-(1/4)*abs(x2-i-abs(x2-i))+(1/4)*abs(x2-i)+(1/4)*abs(x2-i)
-    k=k+1
-for i in range (x-1,y-1):
-    L.append(k)
-    L[k+1]=(1/4)*abs(abs(x2-i)+x2-i)-(1/4)*abs(x2-i-abs(x2-i))+(1/4)*abs(x2-i)+(1/4)*abs(x2-i)
-    k=k+1
-print(L)
+l = 0
+#print('L',k,' =',L)
+for i in range (x-1+y-1):
+    if (i < x-1):
+        L.append(k)
+        L[k+1]=(1/4)*abs(abs(x1-k)+x1-k)-(1/4)*abs(x1-k-abs(x1-k))+(1/2)*abs(x1-k)
+        k=k+1
+        #print('AL',k,' =',L[k])
+    if (i>=x-1):
+        L.append(k)
+        L[k+1]=(1/4)*abs(abs(x2-l)+x2-l)-(1/4)*abs(x2-l-abs(x2-l))+(1/2)*abs(x2-l)
+        k=k+1
+        l=l+1
+        #print('BL',k,' =',L[k])    
 """eval tipo 2"""
+print('tipo 2')
 for i in range (x-1):
     for j in range (y-1):
         L.append(k)
-        L[k+1]=(1/4)*abs(abs(x2-i)+x2-i)-(1/4)*abs(x2-i-abs(x2-i))+(1/4)*abs(x2-i)+(1/4)*abs(x2-i)
+        L[k+1]=(1/4)*abs(abs(x1-i)+x2-j)-(1/4)*abs(x1-i-abs(x2-j))+(1/4)*abs(x1-i)+(1/4)*abs(x2-j)-(1/4)*abs(x1-i-(x2-j))
         k=k+1
-print(L)
-nopsL = L.__len__()
-print(nopsL)
+        #print(L[k])
 """###############################"""
 lamda=[]
-for i in range (x*y): #deberia ser x*y pero se sale de los limites
-    lamda.append(L[i])
-
-A=[]
 for i in range (x*y):
-    A=A ,eval(lamda,[x1=V[i,0],x2=V[i,2]])
-print(A) 
+    lamda.append(i)
+    lamda[i]=L[i]
+    #print(lamda)
+"""#################################"""
+    
+
+
     
