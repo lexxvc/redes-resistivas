@@ -62,7 +62,31 @@ for i in range (x*y):
     lamda[i]=L[i]
     #print(lamda)
 """#################################"""
+A=np.zeros((x*y,x*y))
+for ii in range (x*y):
+    #eval tipo 0
+    A[ii,1]= 1
     
+    #eval tipo 1 
+    k=1
+    for i in range (x-1):
+        A[ii,k+1]=(1/4)*abs(abs(V[ii,0]-i)+V[ii,0]-i)-(1/4)*abs(V[ii,0]-i-abs(V[ii,0]-i))+(1/4)*abs(V[ii,0]-i)+(1/4)*abs(V[ii,0]-i)
+        k=k+1
+    for  i in range (y-1):
+         A[ii,k+1]=(1/4)*abs(abs(V[ii,1]-i)+V[ii,1]-i)-(1/4)*abs(V[ii,1]-i-abs(V[ii,1]-i))+(1/4)*abs(V[ii,1]-i)+(1/4)*abs(V[ii,1]-i);
+         k=k+1
+         
+    #eval tipo 2
+    for i in range (x-1):
+        for j in range (y-1):
+           A[ii,k+1]=(1/4)*abs(abs(V[ii,0]-i)+V[ii,1]-j)-(1/4)*abs(V[ii,0]-i-abs(V[ii,1]-j))+(1/4)*abs(V[ii,0]-i)+(1/4)*abs(V[ii,1]-j)-(1/4)*abs(V[ii,0]-i-(V[ii,1]-j));   
+           k=k+1
+plt.imshow(A)
+plt.show()
+ 
+
+          
+
 
 
     
