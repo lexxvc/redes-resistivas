@@ -3,21 +3,19 @@ from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
 from scipy import  misc
 import matplotlib.pyplot as plt
-#from numpy.linalg import solve, norm
 import PySpice.Logging.Logging as Logging
 logger = Logging.setup_logging()
 from PySpice.Spice.Netlist import Circuit
 import numpy as np 
 import time
-#from PySpice.Unit import *
-title = np.loadtxt('map_1.txt') #se ingresa el mapa a leer
+""" #se ingresa el mapa a leer========================================================="""
+title = np.loadtxt('map_1.txt') 
 mapa = np.matrix(title)
-#print(mapa)
 file='datos.txt'
 Rc = 1
 Rdia = (2*Rc)**0.5
 Rt=1
-""" se definen los puntos de inicio y fin manualmente"""
+""" se definen los puntos de inicio y fin manualmente================================="""
 inicio = [1,1]
 fin = [9,9]
 V=10     
@@ -25,10 +23,10 @@ Rcont =0
 """"este es el mayor numero de pasos que puede hacer el robot para evitar que se cicle"""
 dimension = mapa.shape
 RMax = dimension[0]
-#print(RMax)
 CMax = dimension [1]
-#print(CMax)
+""" inicia el cronometro"""
 tiempo0=time.clock()
+""" creacion del circuito partiendo del mapa=========================================="""
 circuito = Circuit('Resistive grid')
 fd = open(file,'w')
 for i in range (0,RMax):
@@ -66,7 +64,6 @@ for i in range (0,RMax):
 circuito.V('ini', 'n'+str(inicio[0])+'a'+str(inicio[1]), 'n'+str(fin[0])+'a'+str(fin[1]), V)
 circuito.V('fin','n'+str(fin[0])+'a'+str(fin[1]),circuito.gnd,0)
 fd.close()
-
 simulator = circuito.simulator(temperature=25, nominal_temperature=25)
 analysis = simulator.operating_point()
 fd=open('voltajes.csv','w')
@@ -74,27 +71,25 @@ for i in range (0,RMax):
     for j in range (0,CMax):
         if (mapa[i,j]== 1):
                 node = analysis['n'+str(i+1)+'a'+str(j+1)]
-                #print('Nodo {}: {} V'.format(str(node), float(node)))
                 fd=open('voltajes.csv','a')
                 fd.write('Nodo, {}, {}'.format(str(node), float(node))+'\n')
                 fd.close()
 
 
-""" pasamos el netlist del txt a una matriz"""
+""" transferencia  del netlist del txt a una matriz=========================================="""
 datos=np.loadtxt('datos.txt', dtype='str')
-mnl1=np.matrix(datos)             #matriz del net list
-mnl=mnl1.transpose()  # transpuesta 
-jmax=mnl.shape[1]-1   # jmax = 6
-imax=mnl.shape[0]-1   # imax = 3
+mnl1=np.matrix(datos)
+mnl=mnl1.transpose() 
+jmax=mnl.shape[1]-1   
+imax=mnl.shape[0]-1   
 n=0
 m=0
 ncont=0
 nodos=[]
-nin=[0 for x in range(jmax**2)] #nodos de entrada
-nout=[0 for x in range(jmax**2)]#nodos de salida
-#print (imax , jmax)
-#print(mnl)
-# rutina para contar nodos y eliminar repetidos
+nin=[0 for x in range(jmax**2)] 
+nout=[0 for x in range(jmax**2)]
+
+"""  contar nodos y eliminar repetidos======================================================="""
 for i in range(1,imax):
     for j in range(0,jmax):
         if(mnl[i,j]!=('n'+str(fin[0])+'a'+str(fin[1]))):
@@ -102,13 +97,13 @@ for i in range(1,imax):
                 if(mnl[i,j]!=ncont):
                     ncont= mnl[i,j]
                     nin[n]=mnl[i,j]
-                    #print(mnl[i,j])
+                    
                     n=n+1   
             if(i==2):
                 if(mnl[i,j]!=ncont):
                     ncont= mnl[i,j]
                     nout[m]=mnl[i,j]
-                    #print(mnl[i,j])
+                    
                     m=m+1                    
 for k in range (0,jmax-1):
     for l in range (0,jmax-1):
@@ -119,8 +114,8 @@ nin.extend(nout)
 nodos =[elemento for elemento in nin if elemento != 0]
 nodos=set(nodos)
 nodos =sorted(list(nodos))
-#print (nodos)
-""" MNA matrix"""
+
+""" MNA matrix======================================================================="""
 mnasize = len(nodos)+1  
 G=[0 for x in range (len(mnl1))]  
 for i in range (0,len(mnl1)):
@@ -131,20 +126,16 @@ for i in range (jmax+1):
     fd=open('corrientes.csv','a')
     if (mnl1[i,1]== 'n'+str(fin[0])+'a'+str(fin[1])):
         mnl1[i,1]= 'gnd'
-        #current='I'+str(i+1),mnl1[i,1],mnl1[i,2],'G'+str(i+1)
         current='G'+str(i+1),mnl1[i,1],mnl1[i,2],str(G[i])
         
     if (mnl1[i,2]== 'n'+str(fin[0])+'a'+str(fin[1])):
         mnl1[i,2]= 'gnd'
-        #current= 'I'+str(i+1),mnl1[i,1],'-'+mnl1[i,2],'G'+str(i+1)
         current= 'G'+str(i+1),mnl1[i,1],mnl1[i,2],str(G[i])
         
         
     else:
-        #current= 'I'+str(i+1),mnl1[i,1],'-'+mnl1[i,2],'G'+str(i+1)
         current= 'G'+str(i+1),mnl1[i,1],mnl1[i,2],str(G[i])
-        
-    #print (current)
+
     fd.write(str(current)+'\n')
 current = 'Vi','n'+str(inicio[0])+'a'+str(inicio[1]),'gnd',V
 fd.write(str(current)+'\n') 
@@ -170,15 +161,13 @@ for i in range (jmax+2):
             for j in range (len(nodos)):
                 if nodos[j] in corr[i,2]:
                     pos2=j
-                    #print('pos1 xxx')
-# print('pos2 ',pos2,"  G= ", corr[i,0])
+
                     mna[pos2,pos2]=G[i]+mna[pos2,pos2]
         if 'gnd' in corr[i,2]and 'Vi' not in corr[i,0]:
             for j in range (len(nodos)):
                 if  nodos[j] in corr[i,1]:
                     pos1=j
-#  print('pos1 ',pos1,"  G= ", corr[i,0])   
-#   print('pos2 xxx')         
+         
                     mna[pos1,pos1]=G[i]+mna[pos1,pos1] 
         if 'Vi' in corr[i,0]:
             for j in range (len(nodos)):
@@ -187,36 +176,18 @@ for i in range (jmax+2):
                     pos2=len(nodos)
                     mna[pos1,pos2]=1
                     mna[pos2,pos1]=1
-                    #print (pos1,pos2,'Vi')
     else :
         for j in range (len(nodos)):
             if  nodos[j] in corr[i,1]:
                 pos1=j
-                #print('pos1 ',pos1,"  G= ", corr[i,0])
+
             if nodos[j] in corr[i,2]:
                 pos2=j
-                """
-        if (i>0 and i<jmax):
-            print(pos1,pos2,'A')
-            print(mna[pos1,pos1])
-            print(mna[pos2,pos2])
-            print(mna[pos1,pos2])
-            print(mna[pos2,pos1])
-            """
-                #print('pos2 ',pos2,"  -G= ", corr[i,0])
+
         mna[pos1,pos1]=G[i]+mna[pos1,pos1]
         mna[pos2,pos2]=G[i]+mna[pos2,pos2]
         mna[pos1,pos2]=-G[i]+mna[pos1,pos2]
         mna[pos2,pos1]=-G[i]+mna[pos2,pos1] 
-        """
-        if (i>0 and i<jmax):
-            print(pos1,pos2,'B')
-            print(mna[pos1,pos1])
-            print(mna[pos2,pos2])
-            print(mna[pos1,pos2])
-            print(mna[pos2,pos1])
-            """
-   
 fd=open('mna.csv','w')
 fd=open('mna.csv','a')
 for w in range (mnasize-1):
@@ -231,7 +202,7 @@ fd.close()
 print(' MATRIZ MNA NUMERICA') 
 print (mna)
 
-"""seleccionador matrices normal vs dispersa"""
+"""seleccionador matrices normal vs dispersa==============================================="""
 selectsolve = 1
 if selectsolve == 0:
     MNA=np.matrix(mna)
@@ -255,7 +226,6 @@ else :
     b=np.transpose(b)
     for i in range (mnasize):
         b[mov-i,0]=(mna[i,mov])*V
-    print(b)
     """ resolviendo con sparce"""
     A=lil_matrix(mna)
     A = A.tocsr()
@@ -263,9 +233,10 @@ else :
     
     fd=open('vsp.txt','w')
     fd=open('vsp.txt','a')
+    print("Lista de voltajes : \n")
     for i in range (mnasize):
         if (i < mov):
-            """ guardando los datos de voltajes en un archivo """
+            """ guardando los datos de voltajes en un archivo ===================================="""
             fd.write(str(nodos[i])+' '+str(x[i])+'\n')
             print (nodos[i], '= V',x[i])
         else:
@@ -273,7 +244,7 @@ else :
     fd.close()
 """ pasando los datos del archivo a una matriz para su manipulacion"""
 datax=np.loadtxt('vsp.txt', dtype='str')
-""" llenando la matriz Y con los voltajes segun su nodo"""
+""" llenando la matriz Y con los voltajes segun su nodo==========================================="""
 NVoltajes=x.shape
 arr=[]
 row=[] 
@@ -281,8 +252,7 @@ for i in range(CMax):
     row.append(0.0)
     arr.append(row)
 Y=np.matrix(arr)
-print (NVoltajes)
-print (Y)
+print ("numero de voltajes ",NVoltajes)
 mvs=np.matrix(datax)             
 for i in range (mvs.shape[0]):
     xaux = mvs[i,0].split('n')
@@ -293,59 +263,56 @@ for i in range (mvs.shape[0]):
     yei = bob[13:14]
     j=int(wui)-1
     k=int(yei)-1
-    #print(type(wui),type(yei))
     Y[j,k]=mvs[i,1]
-print(Y)   
+print("mapa de voltajes \n",Y)   
 
-""" LCC"""
+""" LCC======================================================================================"""
 xaxis=[]
 yaxis=[]
 i=inicio[0]-1
 j=inicio[1]-1
 i1=inicio[0]-1
 j1=inicio[1]-1
-temp=[-100,-100]#"""cambiar con variables de inicio"""
+temp=[inicio[0]-1,inicio[1]-1]
 val=-100
 ruta=[0,0]
 temp2=ruta
 newnode=[0,0]
 NVoltajes=x.shape
-for cont in range(NVoltajes[0]):#NVoltajes
+for cont in range(NVoltajes[0]):
     i=i1
     j=j1
     nods= [[i-1, j], [i-1, j+1], [i, j+1], [i+1, j+1], [i+1, j], [i+1, j-1], [i, j-1],[i-1, j-1]]
     for k in range (7):
         nod = nods[k]
         if (nod[0]>=0 or nod[1]>=0):
-            print(nod)
             if(i!=fin[0])and(j!=fin[1]):
-                print(temp,(nod[0]==temp[0]),(nod[1]==temp[1]))
                 if not ((nod[0]==temp[0])and(nod[1]==temp[1])):
                     if(nod[0]<= RMax) and (nod[1]<= CMax):
                         if (mapa[nod[0],nod[1]]==1):
                             if (nod[0]== i)or(nod[1]==j):
                                 Rt=Rc
-                               
                             if (nod[0]!= i)and(nod[1]!=j):
                                 Rt=Rdia
-                                
                             if (cont>0):
-
                             	if (((Y[i,j]-Y[nod[0],nod[1]])/Rt)>(val)):
                                 	val=((Y[i,j]-Y[nod[0],nod[1]])/Rt)
-                                	print("val",val,[nod[0],nod[1]],"nodo evaluado",[i,j])
                                 	i1=nod[0]
                                 	j1=nod[1]
     val=-100
     temp=[i,j]
-    print("temp",temp)              
+    """ generacion de ruta con datos del LCC====================================================="""             
     ruta=[ruta,[i,j]]
     xaxis.append(j)
     yaxis.append(i)
     temp=[i,j]
-    
+""" imprecion de coordenadas de ruta y tiempodel proceso========================================"""   
 print (ruta)
+tiempo1=time.clock()
+tiempo = tiempo1-tiempo0
+print("proceso =", tiempo ,"segundos")
 """impresion del mapa y propuesta para generar la ruta"""
 plt.plot(xaxis,yaxis,'b')
 plt.imshow(mapa)
 plt.show()
+"""FIN==========================================================================================="""
